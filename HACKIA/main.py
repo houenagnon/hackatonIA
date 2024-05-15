@@ -4,7 +4,7 @@
 # %load_ext autotime
 !pip install moviepy
 !pip install deep_translator
-!pip install replit
+!pip install streamlit
 !pip install numpy
 """
 import tempfile
@@ -12,7 +12,6 @@ import os
 import requests
 from moviepy.editor import VideoFileClip, AudioFileClip
 import numpy as  np
-import replit
 from deep_translator import GoogleTranslator
 import streamlit as st
 from moviepy.editor import *
@@ -84,17 +83,26 @@ def convert_to_srt(datas, output_filename, lang):
             f.write(f"{start_time} --> {end_time}\n")
             f.write(f"{subtitle_text}\n\n")
 
+
 # Liste des langues disponibles
 langues = ["Français (fr)", "Anglais (en)", "Ewe (ee)", "Yoruba (yo)"]
 
-print("Générer des sous-titres pour une vidéo")
-video_file = replit.FileUpload.get("Choisir une vidéo", file_types=["mp4"])
-cle = replit.TextInput.get("Entrez votre clé DeepGram")
-langue_selectionnee = replit.ChoiceBox.get("Sélectionnez une langue", choices=langues)
+st.title("Générer des sous-titres pour une vidéo")
+
+# Télécharger la vidéo
+video_file = st.file_uploader("Choisir une vidéo", type=["mp4"])
+
+# Saisir la clé DeepGram
+cle = st.text_input("Entrez votre clé DeepGram")
+
+# Sélectionner la langue
+langue_selectionnee = st.selectbox("Sélectionnez une langue", langues)
+
+# Extraire le code de langue
 lang = langue_selectionnee.split("(")[1].split(")")[0]
 
-if replit.Confirm.get("Générer les sous-titres"):
-    if video_file and cle and lang:
+if st.button("Générer les sous-titres"):
+    if video_file is not None and cle and lang:
         # 1. Extraction de l'audio
         mp3url = extraire_audio(video_file.name)
 
@@ -132,6 +140,7 @@ if replit.Confirm.get("Générer les sous-titres"):
         out_file = f"{name}_with_subtitles.mp4"
         result.write_videofile(out_file)
 
-        print(f"La vidéo avec sous-titres est disponible à l'adresse suivante : {replit.FileUrl.get(out_file)}")
+        # Afficher la vidéo avec sous-titres
+        st.video(out_file)
     else:
-        print("Veuillez télécharger une vidéo, entrer une clé DeepGram et sélectionner une langue.")
+        st.warning("Veuillez télécharger une vidéo, entrer une clé DeepGram et sélectionner une langue.")
