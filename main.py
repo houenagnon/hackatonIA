@@ -91,6 +91,7 @@ st.title("Générer des sous-titres pour une vidéo")
 
 # Télécharger la vidéo
 video_file = st.file_uploader("Choisir une vidéo", type=["mp4"])
+st.write(video_file)
 
 # Saisir la clé DeepGram
 cle = st.text_input("Entrez votre clé DeepGram")
@@ -105,7 +106,7 @@ if st.button("Générer les sous-titres"):
     if video_file is not None and cle and lang:
         # 1. Extraction de l'audio
         mp3url = extraire_audio(video_file.name)
-
+        st.write(video_filename)
         # 2. Transcription de l'audio
         output1 = getDeepgramTranscription(mp3url, cle, lang)
 
